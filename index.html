@@ -11,6 +11,11 @@
       <label for="label-font-size">左側標籤字體大小：</label>
       <input type="range" id="label-font-size" name="label-font-size" min="10" max="24" value="16" />
       <span id="label-font-size-value">16px</span>
+
+      <label for="margin-left" style="margin-left: 20px;">左側空間寬度：</label>
+      <input type="range" id="margin-left" name="margin-left" min="100" max="600" value="350" />
+      <span id="margin-left-value">350px</span>
+      <span style="color: #888; font-size: 12px; margin-left: 8px;">（調整後會回到最上層）</span>
     </div>
     <div id="chart"></div>
     <p class="unit-note">數值單位：M = 百萬，G = 十億</p>
@@ -41,5 +46,18 @@
     });
 
     updateLabelFontSize(labelFontSizeInput.value);
+
+    // 左側空間寬度控制
+    const marginLeftInput = document.getElementById("margin-left");
+    const marginLeftValue = document.getElementById("margin-left-value");
+    const updateMarginLeft = (value) => {
+      const px = `${value}px`;
+      marginLeftValue.textContent = px;
+      main.redefine("marginLeft", parseInt(value));
+    };
+
+    marginLeftInput.addEventListener("input", (event) => {
+      updateMarginLeft(event.target.value);
+    });
 
   </script>
