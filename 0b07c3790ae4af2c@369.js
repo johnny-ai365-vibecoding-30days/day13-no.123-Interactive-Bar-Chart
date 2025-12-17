@@ -1,10 +1,8 @@
 function _1(md){return(
-md`<div style="color: grey; font: 13px/25.5px var(--sans-serif); text-transform: uppercase;"><h1 style="display: none;">Hierarchical bar chart</h1><a href="https://d3js.org/">D3</a> › <a href="/@d3/gallery">Gallery</a></div>
+md`# 2019 台灣政府預算-階層式長條圖
 
-# Hierarchical bar chart
-
-Click a blue bar to drill down, or click the background to go back up.`
-)}
+點擊長條可以向下深入各層級，點擊背景即可回到上一層。`)
+}
 
 function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
 {
@@ -12,13 +10,16 @@ function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
       .attr("viewBox", [0, 0, width, height])
       .attr("width", width)
       .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto;");
+      .attr("style", "max-width: 100%; height: auto;")
+      .style("background", "#0b1220")
+      .style("color", "#e2e8f0")
+      .attr("role", "img");
 
   x.domain([0, root.value]);
 
   svg.append("rect")
       .attr("class", "background")
-      .attr("fill", "none")
+      .attr("fill", "#0b1220")
       .attr("pointer-events", "all")
       .attr("width", width)
       .attr("height", height)
@@ -55,6 +56,7 @@ function bar(svg, down, d, selector) {
       .attr("x", marginLeft - 6)
       .attr("y", barStep * (1 - barPadding) / 2)
       .attr("dy", ".35em")
+      .attr("fill", "#e2e8f0")
       .text(d => d.data.name);
 
   bar.append("rect")
@@ -220,9 +222,25 @@ d3.hierarchy(data)
     .eachAfter(d => d.index = d.parent ? d.parent.index = d.parent.index + 1 || 0 : 0)
 )}
 
-function _data(FileAttachment){return(
-FileAttachment("flare-2.json").json()
-)}
+async function _data(FileAttachment,d3){
+  const text = await FileAttachment("tw2019ap.csv").text();
+  const rows = d3.csvParse(text, d3.autoType);
+
+  const rollup = d3.rollup(
+    rows,
+    values => d3.sum(values, d => d.amount),
+    d => d.topname,
+    d => d.depname,
+    d => d.cat,
+    d => d.name
+  );
+
+  const toTree = (node, name) => node instanceof Map
+    ? ({ name, children: Array.from(node, ([key, value]) => toTree(value, key)) })
+    : ({ name, value: node });
+
+  return toTree(rollup, "2019 台灣政府預算");
+}
 
 function _x(d3,marginLeft,width,marginRight){return(
 d3.scaleLinear().range([marginLeft, width - marginRight])
@@ -234,6 +252,8 @@ g => g
     .attr("transform", `translate(0,${marginTop})`)
     .call(d3.axisTop(x).ticks(width / 80, "s"))
     .call(g => (g.selection ? g.selection() : g).select(".domain").remove())
+    .call(g => g.selectAll("text").attr("fill", "#cbd5e1"))
+    .call(g => g.selectAll("line").attr("stroke", "#475569"))
 )}
 
 function _yAxis(marginLeft,marginTop,height,marginBottom){return(
@@ -241,13 +261,13 @@ g => g
     .attr("class", "y-axis")
     .attr("transform", `translate(${marginLeft},0)`)
     .call(g => g.append("line")
-        .attr("stroke", "currentColor")
+        .attr("stroke", "#475569")
         .attr("y1", marginTop)
         .attr("y2", height - marginBottom))
 )}
 
 function _color(d3){return(
-d3.scaleOrdinal([true, false], ["steelblue", "#aaa"])
+d3.scaleOrdinal([true, false], ["#38bdf8", "#475569"])
 )}
 
 function _barStep(){return(
@@ -290,7 +310,7 @@ export default function define(runtime, observer) {
   const main = runtime.module();
   function toString() { return this.url; }
   const fileAttachments = new Map([
-    ["flare-2.json", {url: new URL("./files/e65374209781891f37dea1e7a6e1c5e020a3009b8aedf113b4c80942018887a1176ad4945cf14444603ff91d3da371b3b0d72419fa8d2ee0f6e815732475d5de.json", import.meta.url), mimeType: "application/json", toString}]
+    ["tw2019ap.csv", {url: new URL("./tw2019ap.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer()).define(["md"], _1);
@@ -301,7 +321,7 @@ export default function define(runtime, observer) {
   main.variable(observer("stack")).define("stack", ["x","barStep"], _stack);
   main.variable(observer("stagger")).define("stagger", ["x","barStep"], _stagger);
   main.variable(observer("root")).define("root", ["d3","data"], _root);
-  main.variable(observer("data")).define("data", ["FileAttachment"], _data);
+  main.variable(observer("data")).define("data", ["FileAttachment","d3"], _data);
   main.variable(observer("x")).define("x", ["d3","marginLeft","width","marginRight"], _x);
   main.variable(observer("xAxis")).define("xAxis", ["marginTop","d3","x","width"], _xAxis);
   main.variable(observer("yAxis")).define("yAxis", ["marginLeft","marginTop","height","marginBottom"], _yAxis);
