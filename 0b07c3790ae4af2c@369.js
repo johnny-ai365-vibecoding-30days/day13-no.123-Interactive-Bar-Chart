@@ -1,24 +1,24 @@
 function _1(md){return(
-md`<div style="color: grey; font: 13px/25.5px var(--sans-serif); text-transform: uppercase;"><h1 style="display: none;">Hierarchical bar chart</h1><a href="https://d3js.org/">D3</a> › <a href="/@d3/gallery">Gallery</a></div>
+md`# 2019 台灣政府預算-階層式長條圖
 
-# Hierarchical bar chart
-
-Click a blue bar to drill down, or click the background to go back up.`
+點擊長條以展開下一層預算；點擊圖表空白處可回到上一層。
+資料來源：2019 年中央政府總預算（tw2019ap.csv）。`
 )}
 
 function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
 {
   const svg = d3.create("svg")
+      .attr("class", "hierarchical-chart")
       .attr("viewBox", [0, 0, width, height])
       .attr("width", width)
       .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto;");
+      .attr("style", "max-width: 100%; height: auto; background: var(--panel-color); color: var(--text-secondary);");
 
   x.domain([0, root.value]);
 
   svg.append("rect")
       .attr("class", "background")
-      .attr("fill", "none")
+      .attr("fill", "var(--panel-color)")
       .attr("pointer-events", "all")
       .attr("width", width)
       .attr("height", height)
@@ -220,8 +220,42 @@ d3.hierarchy(data)
     .eachAfter(d => d.index = d.parent ? d.parent.index = d.parent.index + 1 || 0 : 0)
 )}
 
-function _data(FileAttachment){return(
-FileAttachment("flare-2.json").json()
+function _buildHierarchy(){return(
+function buildHierarchy(rows) {
+  const root = {name: "2019 年預算", children: [], _map: new Map()};
+  const levels = ["topname", "depname", "depcat", "cat", "name"];
+
+  for (const row of rows) {
+    let node = root;
+    for (const key of levels) {
+      const label = row[key] || "未分類";
+      if (!node._map) node._map = new Map();
+      if (!node._map.has(label)) {
+        const child = {name: label, children: [], _map: new Map()};
+        node._map.set(label, child);
+        node.children.push(child);
+      }
+      node = node._map.get(label);
+    }
+    node.value = (node.value || 0) + (Number(row.amount) || 0);
+  }
+
+  const clean = node => {
+    if (node._map) delete node._map;
+    if (node.children && node.children.length) {
+      node.children.forEach(clean);
+    } else {
+      delete node.children;
+    }
+    return node;
+  };
+
+  return clean(root);
+}
+)}
+
+function _data(FileAttachment,buildHierarchy){return(
+FileAttachment("tw2019ap.csv").csv({typed: true}).then(buildHierarchy)
 )}
 
 function _x(d3,marginLeft,width,marginRight){return(
@@ -247,7 +281,7 @@ g => g
 )}
 
 function _color(d3){return(
-d3.scaleOrdinal([true, false], ["steelblue", "#aaa"])
+d3.scaleOrdinal([true, false], ["#7dcfff", "#4b5563"])
 )}
 
 function _barStep(){return(
@@ -290,7 +324,7 @@ export default function define(runtime, observer) {
   const main = runtime.module();
   function toString() { return this.url; }
   const fileAttachments = new Map([
-    ["flare-2.json", {url: new URL("./files/e65374209781891f37dea1e7a6e1c5e020a3009b8aedf113b4c80942018887a1176ad4945cf14444603ff91d3da371b3b0d72419fa8d2ee0f6e815732475d5de.json", import.meta.url), mimeType: "application/json", toString}]
+    ["tw2019ap.csv", {url: new URL("./tw2019ap.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer()).define(["md"], _1);
@@ -301,7 +335,8 @@ export default function define(runtime, observer) {
   main.variable(observer("stack")).define("stack", ["x","barStep"], _stack);
   main.variable(observer("stagger")).define("stagger", ["x","barStep"], _stagger);
   main.variable(observer("root")).define("root", ["d3","data"], _root);
-  main.variable(observer("data")).define("data", ["FileAttachment"], _data);
+  main.variable(observer("buildHierarchy")).define("buildHierarchy", _buildHierarchy);
+  main.variable(observer("data")).define("data", ["FileAttachment","buildHierarchy"], _data);
   main.variable(observer("x")).define("x", ["d3","marginLeft","width","marginRight"], _x);
   main.variable(observer("xAxis")).define("xAxis", ["marginTop","d3","x","width"], _xAxis);
   main.variable(observer("yAxis")).define("yAxis", ["marginLeft","marginTop","height","marginBottom"], _yAxis);

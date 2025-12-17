@@ -1,0 +1,61 @@
+:root {
+  color-scheme: dark;
+  --bg-color: #0b1021;
+  --panel-color: #111827;
+  --text-primary: #e6edf3;
+  --text-secondary: #9baecf;
+  --accent: #67b7ff;
+  --accent-muted: #7d8590;
+  --grid-color: #1f2937;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  font-family: "Noto Sans TC", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+h1 {
+  margin-bottom: 0.25em;
+}
+
+p {
+  margin-top: 0;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent);
+}
+
+a:hover {
+  color: #8dc6ff;
+}
+
+.hierarchical-chart {
+  background: var(--panel-color);
+  color: var(--text-secondary);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.hierarchical-chart text {
+  fill: var(--text-primary);
+  font-size: 12px;
+}
+
+.hierarchical-chart .x-axis text,
+.hierarchical-chart .y-axis text {
+  fill: var(--text-secondary);
+}
+
+.hierarchical-chart .tick line {
+  stroke: var(--grid-color);
+}
+
+.hierarchical-chart .background {
+  fill: var(--panel-color);
+}
