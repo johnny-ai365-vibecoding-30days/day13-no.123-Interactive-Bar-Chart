@@ -1,9 +1,9 @@
 function _1(md){return(
-md`<div style="color: grey; font: 13px/25.5px var(--sans-serif); text-transform: uppercase;"><h1 style="display: none;">Hierarchical bar chart</h1><a href="https://d3js.org/">D3</a> › <a href="/@d3/gallery">Gallery</a></div>
+md`# 2019 台灣政府預算-階層式長條圖
 
-# Hierarchical bar chart
+點擊長條即可下鑽檢視細項，點擊圖表空白處可回到上一層。依據層級自動排序，數值以新臺幣元為單位。
 
-Click a blue bar to drill down, or click the background to go back up.`
+資料來源：2019 年中央政府總預算（加值整理版）。`
 )}
 
 function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
@@ -12,7 +12,7 @@ function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
       .attr("viewBox", [0, 0, width, height])
       .attr("width", width)
       .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto;");
+      .attr("style", "max-width: 100%; height: auto; background: #0f172a; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);");
 
   x.domain([0, root.value]);
 
@@ -43,7 +43,7 @@ function bar(svg, down, d, selector) {
       .attr("class", "enter")
       .attr("transform", `translate(0,${marginTop + barStep * barPadding})`)
       .attr("text-anchor", "end")
-      .style("font", "10px sans-serif");
+      .style("font", "12px \"Noto Sans TC\", sans-serif");
 
   const bar = g.selectAll("g")
     .data(d.children)
@@ -55,12 +55,14 @@ function bar(svg, down, d, selector) {
       .attr("x", marginLeft - 6)
       .attr("y", barStep * (1 - barPadding) / 2)
       .attr("dy", ".35em")
+      .attr("fill", "#e2e8f0")
       .text(d => d.data.name);
 
   bar.append("rect")
       .attr("x", x(0))
       .attr("width", d => x(d.value) - x(0))
-      .attr("height", barStep * (1 - barPadding));
+      .attr("height", barStep * (1 - barPadding))
+      .attr("rx", 4);
 
   return g;
 }
@@ -220,8 +222,38 @@ d3.hierarchy(data)
     .eachAfter(d => d.index = d.parent ? d.parent.index = d.parent.index + 1 || 0 : 0)
 )}
 
-function _data(FileAttachment){return(
-FileAttachment("flare-2.json").json()
+function _data(FileAttachment,d3){return(
+FileAttachment("2019app.csv").text().then(raw => {
+  const rows = d3.csvParse(raw, d => ({
+    year: +d.year,
+    amount: +d.amount,
+    name: d.name,
+    top: d.topname,
+    dep: d.depname,
+    cat: d.cat
+  }));
+
+  const root = {name: "2019 台灣政府預算", children: []};
+
+  function getNode(parent, name) {
+    let node = parent.children.find(c => c.name === name);
+    if (!node) {
+      node = {name, children: []};
+      parent.children.push(node);
+    }
+    return node;
+  }
+
+  for (const row of rows) {
+    if (!row.top || !row.dep || !row.cat) continue;
+    const topNode = getNode(root, row.top);
+    const depNode = getNode(topNode, row.dep);
+    const catNode = getNode(depNode, row.cat);
+    catNode.children.push({name: row.name, value: row.amount});
+  }
+
+  return root;
+})
 )}
 
 function _x(d3,marginLeft,width,marginRight){return(
@@ -234,6 +266,8 @@ g => g
     .attr("transform", `translate(0,${marginTop})`)
     .call(d3.axisTop(x).ticks(width / 80, "s"))
     .call(g => (g.selection ? g.selection() : g).select(".domain").remove())
+    .call(g => g.selectAll("text").attr("fill", "#cbd5e1"))
+    .call(g => g.selectAll("line").attr("stroke", "#334155"))
 )}
 
 function _yAxis(marginLeft,marginTop,height,marginBottom){return(
@@ -241,17 +275,18 @@ g => g
     .attr("class", "y-axis")
     .attr("transform", `translate(${marginLeft},0)`)
     .call(g => g.append("line")
-        .attr("stroke", "currentColor")
+        .attr("stroke", "#334155")
         .attr("y1", marginTop)
         .attr("y2", height - marginBottom))
+    .call(g => g.selectAll("text").attr("fill", "#cbd5e1"))
 )}
 
 function _color(d3){return(
-d3.scaleOrdinal([true, false], ["steelblue", "#aaa"])
+d3.scaleOrdinal([true, false], ["#38bdf8", "#64748b"])
 )}
 
 function _barStep(){return(
-27
+30
 )}
 
 function _barPadding(barStep){return(
@@ -271,7 +306,7 @@ function _height(root,barStep,marginTop,marginBottom)
 
 
 function _marginTop(){return(
-30
+48
 )}
 
 function _marginRight(){return(
@@ -290,7 +325,7 @@ export default function define(runtime, observer) {
   const main = runtime.module();
   function toString() { return this.url; }
   const fileAttachments = new Map([
-    ["flare-2.json", {url: new URL("./files/e65374209781891f37dea1e7a6e1c5e020a3009b8aedf113b4c80942018887a1176ad4945cf14444603ff91d3da371b3b0d72419fa8d2ee0f6e815732475d5de.json", import.meta.url), mimeType: "application/json", toString}]
+    ["2019app.csv", {url: new URL("./2019app.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer()).define(["md"], _1);
