@@ -4,12 +4,21 @@
 <link rel="stylesheet" type="text/css" href="./inspector.css">
 <link rel="stylesheet" type="text/css" href="./styles.css">
 <body>
-<script type="module">
+<main class="app">
+  <div class="content" id="content"></div>
+  <div class="chart-wrapper" id="chart"></div>
+  <p class="unit-note">單位：M（百萬）、G（十億）</p>
+</main>
 
+<script type="module">
 import define from "./index.js";
-import {Runtime, Library, Inspector} from "./runtime.js";
+import {Runtime, Inspector} from "./runtime.js";
 
 const runtime = new Runtime();
-const main = runtime.module(define, Inspector.into(document.body));
+runtime.module(define, name => {
+  if (name === "md") return new Inspector(document.querySelector("#content"));
+  if (name === "chart") return new Inspector(document.querySelector("#chart"));
+  return null;
+});
 
 </script>

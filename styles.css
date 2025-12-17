@@ -35,6 +35,27 @@ a:hover {
   color: #8dc6ff;
 }
 
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chart-wrapper {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--panel-color);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.unit-note {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
 .hierarchical-chart {
   background: var(--panel-color);
   color: var(--text-secondary);
