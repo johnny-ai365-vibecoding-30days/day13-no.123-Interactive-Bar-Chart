@@ -1,9 +1,9 @@
 function _1(md){return(
-md`<div style="color: grey; font: 13px/25.5px var(--sans-serif); text-transform: uppercase;"><h1 style="display: none;">Hierarchical bar chart</h1><a href="https://d3js.org/">D3</a> › <a href="/@d3/gallery">Gallery</a></div>
+md`<div style="color: #94a3b8; font: 13px/25.5px var(--sans-serif); text-transform: uppercase;"><h1 style="display: none;">2019 台灣政府預算-階層式長條圖</h1></div>
 
-# Hierarchical bar chart
+# 2019 台灣政府預算-階層式長條圖
 
-Click a blue bar to drill down, or click the background to go back up.`
+點擊長條可深入下一層級，點擊背景可返回上一層。`
 )}
 
 function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
@@ -12,7 +12,7 @@ function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
       .attr("viewBox", [0, 0, width, height])
       .attr("width", width)
       .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto;");
+      .attr("style", "max-width: 100%; height: auto; background-color: #0f172a; border: 1px solid #1f2937; border-radius: 14px; box-shadow: 0 12px 35px rgba(0,0,0,0.35); color: #e5e7eb;");
 
   x.domain([0, root.value]);
 
@@ -43,7 +43,8 @@ function bar(svg, down, d, selector) {
       .attr("class", "enter")
       .attr("transform", `translate(0,${marginTop + barStep * barPadding})`)
       .attr("text-anchor", "end")
-      .style("font", "10px sans-serif");
+      .style("font", "12px 'Noto Sans TC', 'Inter', sans-serif")
+      .attr("fill", "#e5e7eb");
 
   const bar = g.selectAll("g")
     .data(d.children)
@@ -55,6 +56,7 @@ function bar(svg, down, d, selector) {
       .attr("x", marginLeft - 6)
       .attr("y", barStep * (1 - barPadding) / 2)
       .attr("dy", ".35em")
+      .attr("fill", "#e5e7eb")
       .text(d => d.data.name);
 
   bar.append("rect")
@@ -221,33 +223,56 @@ d3.hierarchy(data)
 )}
 
 function _data(FileAttachment){return(
-FileAttachment("flare-2.json").json()
+FileAttachment("tw2019ap.csv").csv({typed: true}).then(rows => {
+  const root = {name: "2019 台灣政府預算", children: []};
+
+  for (const row of rows) {
+    const path = [row.topname, row.depname, row.cat, row.name];
+    let current = root;
+
+    for (const segment of path) {
+      let child = current.children.find(c => c.name === segment);
+      if (!child) {
+        child = {name: segment, children: []};
+        current.children.push(child);
+      }
+      current = child;
+    }
+
+    current.value = row.amount;
+  }
+
+  return root;
+})
 )}
 
 function _x(d3,marginLeft,width,marginRight){return(
 d3.scaleLinear().range([marginLeft, width - marginRight])
 )}
 
-function _xAxis(marginTop,d3,x,width){return(
-g => g
-    .attr("class", "x-axis")
-    .attr("transform", `translate(0,${marginTop})`)
-    .call(d3.axisTop(x).ticks(width / 80, "s"))
-    .call(g => (g.selection ? g.selection() : g).select(".domain").remove())
-)}
+  function _xAxis(marginTop,d3,x,width){return(
+  g => g
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${marginTop})`)
+      .call(d3.axisTop(x).ticks(width / 80, "s"))
+      .call(g => (g.selection ? g.selection() : g).select(".domain").remove())
+      .call(g => g.selectAll("text").attr("fill", "#cbd5e1"))
+      .call(g => g.selectAll("line").attr("stroke", "#1f2937"))
+  )}
 
-function _yAxis(marginLeft,marginTop,height,marginBottom){return(
-g => g
-    .attr("class", "y-axis")
-    .attr("transform", `translate(${marginLeft},0)`)
-    .call(g => g.append("line")
-        .attr("stroke", "currentColor")
-        .attr("y1", marginTop)
-        .attr("y2", height - marginBottom))
-)}
+  function _yAxis(marginLeft,marginTop,height,marginBottom){return(
+  g => g
+      .attr("class", "y-axis")
+      .attr("transform", `translate(${marginLeft},0)`)
+      .call(g => g.append("line")
+          .attr("stroke", "#1f2937")
+          .attr("y1", marginTop)
+          .attr("y2", height - marginBottom))
+      .call(g => g.selectAll("text").attr("fill", "#cbd5e1"))
+  )}
 
 function _color(d3){return(
-d3.scaleOrdinal([true, false], ["steelblue", "#aaa"])
+d3.scaleOrdinal([true, false], ["#60a5fa", "#475569"])
 )}
 
 function _barStep(){return(
@@ -290,7 +315,7 @@ export default function define(runtime, observer) {
   const main = runtime.module();
   function toString() { return this.url; }
   const fileAttachments = new Map([
-    ["flare-2.json", {url: new URL("./files/e65374209781891f37dea1e7a6e1c5e020a3009b8aedf113b4c80942018887a1176ad4945cf14444603ff91d3da371b3b0d72419fa8d2ee0f6e815732475d5de.json", import.meta.url), mimeType: "application/json", toString}]
+    ["tw2019ap.csv", {url: new URL("./tw2019ap.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer()).define(["md"], _1);
