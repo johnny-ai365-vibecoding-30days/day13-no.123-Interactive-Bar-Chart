@@ -27,7 +27,7 @@ jobs:
       - name: Prepare site files
         run: |
           mkdir -p dist
-          cp index.html index.js runtime.js inspector.css 0b07c3790ae4af2c@369.js dist/
+          cp index.html index.js runtime.js inspector.css styles.css 0b07c3790ae4af2c@369.js tw2019ap.csv dist/
           cp -R files dist/files
 
       - name: Upload Pages artifact
