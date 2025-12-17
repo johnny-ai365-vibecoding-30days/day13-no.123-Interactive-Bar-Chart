@@ -5,7 +5,7 @@ md`# 2019 台灣政府預算-階層式長條圖
 資料來源：2019 年中央政府總預算（tw2019ap.csv）。`
 )}
 
-function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
+function _chart(d3,width,height,x,root,up,xAxis,yAxis,down,marginTop)
 {
   const svg = d3.create("svg")
       .attr("class", "hierarchical-chart")
@@ -15,6 +15,13 @@ function _chart(d3,width,height,x,root,up,xAxis,yAxis,down)
       .attr("style", "max-width: 100%; height: auto; background: var(--panel-color); color: var(--text-secondary);");
 
   x.domain([0, root.value]);
+
+  svg.append("text")
+      .attr("class", "unit-note")
+      .attr("x", width - 8)
+      .attr("y", marginTop - 12)
+      .attr("text-anchor", "end")
+      .text("單位：M = 百萬、G = 十億");
 
   svg.append("rect")
       .attr("class", "background")
@@ -327,8 +334,8 @@ export default function define(runtime, observer) {
     ["tw2019ap.csv", {url: new URL("./tw2019ap.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
-  main.variable(observer()).define(["md"], _1);
-  main.variable(observer("chart")).define("chart", ["d3","width","height","x","root","up","xAxis","yAxis","down"], _chart);
+  main.variable(observer("intro")).define("intro", ["md"], _1);
+  main.variable(observer("chart")).define("chart", ["d3","width","height","x","root","up","xAxis","yAxis","down","marginTop"], _chart);
   main.variable(observer("bar")).define("bar", ["marginTop","barStep","barPadding","marginLeft","x"], _bar);
   main.variable(observer("down")).define("down", ["d3","duration","bar","stack","stagger","x","xAxis","barStep","color"], _down);
   main.variable(observer("up")).define("up", ["duration","x","d3","xAxis","stagger","stack","color","bar","down","barStep"], _up);

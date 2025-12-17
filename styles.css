@@ -59,3 +59,8 @@ a:hover {
 .hierarchical-chart .background {
   fill: var(--panel-color);
 }
+
+.hierarchical-chart .unit-note {
+  fill: var(--text-secondary);
+  font-size: 11px;
+}
