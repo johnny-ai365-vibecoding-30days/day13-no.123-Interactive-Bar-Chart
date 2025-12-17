@@ -1,4 +1,4 @@
-function _1(md){return(
+function _intro(md){return(
 md`# 2019 台灣政府預算-階層式長條圖
 
 點擊長條以展開下一層預算；點擊圖表空白處可回到上一層。
@@ -327,7 +327,7 @@ export default function define(runtime, observer) {
     ["tw2019ap.csv", {url: new URL("./tw2019ap.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
-  main.variable(observer()).define(["md"], _1);
+  main.variable(observer("intro")).define("intro", ["md"], _intro);
   main.variable(observer("chart")).define("chart", ["d3","width","height","x","root","up","xAxis","yAxis","down"], _chart);
   main.variable(observer("bar")).define("bar", ["marginTop","barStep","barPadding","marginLeft","x"], _bar);
   main.variable(observer("down")).define("down", ["d3","duration","bar","stack","stagger","x","xAxis","barStep","color"], _down);
