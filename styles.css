@@ -7,6 +7,7 @@
   --accent: #67b7ff;
   --accent-muted: #7d8590;
   --grid-color: #1f2937;
+  --label-font-size: 13px;
 }
 
 body {
@@ -19,7 +20,7 @@ body {
 }
 
 .page {
-  max-width: 960px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
@@ -69,4 +70,22 @@ a:hover {
   margin-top: 12px;
   color: var(--text-secondary);
   font-size: 14px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+  color: var(--text-secondary);
+}
+
+.controls label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.controls input[type="range"] {
+  accent-color: var(--accent);
 }

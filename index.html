@@ -6,12 +6,37 @@
 <body>
   <main class="page">
     <div id="intro"></div>
+    <div class="controls">
+      <label for="label-font-size">機關名稱字體大小 <span id="label-font-size-value">13</span>px</label>
+      <input
+        id="label-font-size"
+        type="range"
+        min="10"
+        max="24"
+        step="1"
+        value="13"
+        aria-label="調整機關名稱字體大小"
+      />
+    </div>
     <div id="chart"></div>
     <p class="unit-note">數值單位：M = 百萬，G = 十億</p>
   </main>
 
+  <script>
+    const fontSizeInput = document.getElementById("label-font-size");
+    const fontSizeValue = document.getElementById("label-font-size-value");
+
+    const setLabelFontSize = (size) => {
+      document.documentElement.style.setProperty("--label-font-size", `${size}px`);
+      fontSizeValue.textContent = size;
+    };
+
+    setLabelFontSize(fontSizeInput.value);
+    fontSizeInput.addEventListener("input", (event) => setLabelFontSize(event.target.value));
+  </script>
+
   <script type="module">
-  
+
   import define from "./index.js";
   import {Runtime, Library, Inspector} from "./runtime.js";
   

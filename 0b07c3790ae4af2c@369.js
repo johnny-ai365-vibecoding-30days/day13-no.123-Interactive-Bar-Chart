@@ -43,7 +43,7 @@ function bar(svg, down, d, selector) {
       .attr("class", "enter")
       .attr("transform", `translate(0,${marginTop + barStep * barPadding})`)
       .attr("text-anchor", "end")
-      .style("font", "10px sans-serif");
+      .style("font", "var(--label-font-size) sans-serif");
 
   const bar = g.selectAll("g")
     .data(d.children)
