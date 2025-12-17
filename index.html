@@ -6,6 +6,11 @@
 <body>
   <main class="page">
     <div id="intro"></div>
+    <div class="controls">
+      <label for="labelFontSize">機關名稱字體大小</label>
+      <input id="labelFontSize" type="range" min="10" max="24" value="14" />
+      <span id="labelFontSizeValue">14px</span>
+    </div>
     <div id="chart"></div>
     <p class="unit-note">數值單位：M = 百萬，G = 十億</p>
   </main>
@@ -21,5 +26,17 @@
     if (name === "chart") return Inspector.into(document.querySelector("#chart"))();
     return null;
   });
-  
+
+  const fontSizeInput = document.getElementById("labelFontSize");
+  const fontSizeValue = document.getElementById("labelFontSizeValue");
+
+  const updateLabelFontSize = (value) => {
+    const size = `${value}px`;
+    document.documentElement.style.setProperty("--label-font-size", size);
+    fontSizeValue.textContent = size;
+  };
+
+  fontSizeInput.addEventListener("input", (event) => updateLabelFontSize(event.target.value));
+  updateLabelFontSize(fontSizeInput.value);
+
   </script>

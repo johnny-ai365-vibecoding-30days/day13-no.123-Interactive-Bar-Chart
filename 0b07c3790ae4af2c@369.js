@@ -42,8 +42,7 @@ function bar(svg, down, d, selector) {
   const g = svg.insert("g", selector)
       .attr("class", "enter")
       .attr("transform", `translate(0,${marginTop + barStep * barPadding})`)
-      .attr("text-anchor", "end")
-      .style("font", "10px sans-serif");
+      .attr("text-anchor", "end");
 
   const bar = g.selectAll("g")
     .data(d.children)
@@ -52,6 +51,7 @@ function bar(svg, down, d, selector) {
       .on("click", (event, d) => down(svg, d));
 
   bar.append("text")
+      .attr("class", "bar-label")
       .attr("x", marginLeft - 6)
       .attr("y", barStep * (1 - barPadding) / 2)
       .attr("dy", ".35em")

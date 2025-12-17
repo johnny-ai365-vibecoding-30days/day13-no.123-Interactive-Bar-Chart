@@ -7,6 +7,7 @@
   --accent: #67b7ff;
   --accent-muted: #7d8590;
   --grid-color: #1f2937;
+  --label-font-size: 14px;
 }
 
 body {
@@ -19,7 +20,7 @@ body {
 }
 
 .page {
-  max-width: 960px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
@@ -52,6 +53,11 @@ a:hover {
   font-size: 12px;
 }
 
+.hierarchical-chart .bar-label {
+  font-size: var(--label-font-size);
+  font-weight: 600;
+}
+
 .hierarchical-chart .x-axis text,
 .hierarchical-chart .y-axis text {
   fill: var(--text-secondary);
@@ -69,4 +75,17 @@ a:hover {
   margin-top: 12px;
   color: var(--text-secondary);
   font-size: 14px;
+}
+
+.controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.controls input[type="range"] {
+  accent-color: var(--accent);
 }
