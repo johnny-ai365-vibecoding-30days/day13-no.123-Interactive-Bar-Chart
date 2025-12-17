@@ -18,6 +18,11 @@ body {
   line-height: 1.6;
 }
 
+.page {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
 h1 {
   margin-bottom: 0.25em;
 }
@@ -58,4 +63,13 @@ a:hover {
 
 .hierarchical-chart .background {
   fill: var(--panel-color);
+}
+
+.unit-note {
+  margin-top: 12px;
+  color: var(--text-secondary);
+}
+
+.unit-note strong {
+  color: var(--text-primary);
 }
